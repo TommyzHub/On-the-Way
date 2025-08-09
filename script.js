@@ -94,7 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         console.log("Starting geocoding for destination:", endAddress);
 
-        const geocodeUrl = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(endAddress)}&format=json&addressdetails=1&limit=1`;
+const googlePlacesApiUrl = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${searchQuery}&location=${currentLat},${currentLon}&radius=10000&key=AIzaSyCG_X7QjB3kuigVLBJNZlkRdDMomlL7dQg`;
 
         fetch(geocodeUrl)
             .then(response => {
