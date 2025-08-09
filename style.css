@@ -96,12 +96,12 @@ button:hover {
 /* Styles for mobile devices (screen width up to 768px) */
 @media (max-width: 768px) {
     .controls {
-        position: fixed;
-        bottom: 0;
-        top: auto;
+        position: fixed; /* Fixes controls to the viewport */
+        bottom: 0; /* Puts controls at the bottom of the screen */
+        top: auto; /* Removes the top positioning */
         left: 0;
-        transform: none;
-        width: 100%;
+        transform: none; /* Removes the horizontal centering transform */
+        width: 100%; /* Makes controls span the full width */
         max-width: none;
         padding: 15px;
         border-radius: 0;
@@ -109,7 +109,7 @@ button:hover {
     }
 
     #results-container {
-        max-height: 100px;
+        max-height: 100px; /* Limits the height of the results list on mobile */
         overflow-y: auto;
     }
 }
