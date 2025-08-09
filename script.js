@@ -94,7 +94,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         console.log("Starting geocoding for destination:", endAddress);
 
-const googlePlacesApiUrl = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${searchQuery}&location=${currentLat},${currentLon}&radius=10000&key=AIzaSyCG_X7QjB3kuigVLBJNZlkRdDMomlL7dQg`;
+        // Geocoding URL for Nominatim (converts address to coordinates)
+        const geocodeUrl = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(endAddress)}&format=json&limit=1`;
 
         fetch(geocodeUrl)
             .then(response => {
@@ -162,64 +163,51 @@ const googlePlacesApiUrl = `https://maps.googleapis.com/maps/api/place/textsearc
     }
 
     // --- FUNCTION TO SEARCH ALONG THE ROUTE ---
-function searchForPointsOfInterest(searchQuery, bbox) {
-    console.log(`Searching for '${searchQuery}' within bounding box: ${bbox}`);
+    function searchForPointsOfInterest(searchQuery, bbox) {
+        console.log(`Searching for '${searchQuery}' with Google Places API...`);
 
-    // Clear previous POI markers
-    poiMarkers.clearLayers();
-    resultsList.innerHTML = '';
+        // Clear previous POI markers
+        poiMarkers.clearLayers();
+        resultsList.innerHTML = '';
 
-    const query = `
-        [out:json][timeout:60];
-        (
-            node["amenity"~"${searchQuery}",i](${bbox});
-            node["name"~"${searchQuery}",i](${bbox});
-            way["amenity"~"${searchQuery}",i](${bbox});
-            way["name"~"${searchQuery}",i](${bbox});
-            rel["amenity"~"${searchQuery}",i](${bbox});
-            rel["name"~"${searchQuery}",i](${bbox});
-        );
-        out center;
-    `;
-    const overpassUrl = `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`;
+        // Google Places API call
+        const googlePlacesApiUrl = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(searchQuery)}&location=${currentLat},${currentLon}&radius=10000&key=AIzaSyCG_X7QjB3kuigVLBJNZlkRdDMomlL7dQg`;
 
-    fetch(overpassUrl)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`Overpass API error! status: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log("Overpass API raw data:", data);
+        fetch(googlePlacesApiUrl)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Google Places API error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log("Google Places API raw data:", data);
 
-            if (data.elements && data.elements.length > 0) {
-                console.log(`Found ${data.elements.length} points of interest.`);
-                data.elements.forEach((element) => {
-                    const lat = element.lat || (element.center ? element.center.lat : null);
-                    const lon = element.lon || (element.center ? element.center.lon : null);
-
-                    if (lat && lon) {
-                        const name = element.tags.name || element.tags.amenity || 'Unnamed';
+                if (data.results && data.results.length > 0) {
+                    console.log(`Found ${data.results.length} points of interest with Google Places.`);
+                    data.results.forEach((place) => {
+                        const lat = place.geometry.location.lat;
+                        const lon = place.geometry.location.lng;
+                        const name = place.name || 'Unnamed';
+                        const address = place.formatted_address || 'Address not available';
 
                         const marker = L.marker([lat, lon]).addTo(poiMarkers)
-                            .bindPopup(`<b>${name}</b><br>${element.tags.amenity || ''}`);
+                            .bindPopup(`<b>${name}</b><br>${address}`);
 
                         const listItem = document.createElement('li');
                         listItem.textContent = name;
                         resultsList.appendChild(listItem);
-                    }
-                });
-            } else {
-                console.log("No points of interest found for this query.");
-                resultsList.innerHTML = '<li>No results found.</li>';
-            }
-        })
-        .catch(error => {
-            console.error("Error during Overpass API fetch:", error);
-            alert("An error occurred while searching for points of interest.");
-        });
-}
+                    });
+                } else {
+                    console.log("No points of interest found for this query.");
+                    resultsList.innerHTML = '<li>No results found.</li>';
+                }
+            })
+            .catch(error => {
+                console.error("Error during Google Places API fetch:", error);
+                alert("An error occurred while searching for points of interest.");
+            });
+    }
 
     // Event Listener for the Search Button
     searchButton.addEventListener('click', () => {
