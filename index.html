@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Route Stop Finder</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
+    <link rel="stylesheet" href="style.css">
+    
+    <style>
+        html, body, #app-container {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        #map {
+            height: 100%;
+            width: 100%;
+        }
+
+        /* Basic styles for controls to keep them visible */
+        .controls {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 1000;
+            background-color: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <div id="app-container">
+        <div id="map"></div>
+        <div class="controls">
+            <div class="input-group">
+                <label for="destinationInput">Destination:</label>
+                <input type="text" id="destinationInput" placeholder="Enter destination">
+            </div>
+            <div class="input-group">
+                <label for="searchQueryInput">Search:</label>
+                <input type="text" id="searchQueryInput" placeholder="e.g., coffee shop, gas station">
+            </div>
+            <button id="searchButton">Search Along Route</button>
+            <div id="results-container">
+                <h2>Results</h2>
+                <ul id="resultsList"></ul>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
